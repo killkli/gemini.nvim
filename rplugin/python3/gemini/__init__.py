@@ -11,7 +11,7 @@ import google.generativeai as genai
 generation_config = {
     'temperature': 0.3,
     'top_p': 0.6,
-    'top_k': 100,
+    'top_k': 20,
 }
 
 safety_settings = [
