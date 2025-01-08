@@ -303,5 +303,5 @@ class GeminiPlugin(object):
         })
         self.chat_history.append({
             'role': 'model',
-            'parts': [current]
+            'parts': [last_response.text]
         })
