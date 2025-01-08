@@ -168,10 +168,10 @@ class GeminiPlugin(object):
             #         pass
 
             self.nvim.request('nvim_echo', [['gemini done.']], True, {})
-            insert_chat(request, current)
+            insert_chat(request, response.text)
 
             self.module.handle_async_callback(dict(
-                result=current,
+                result=response.text,
                 win_id=win_id,
                 bufnr=bufnr,
             ))
