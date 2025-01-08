@@ -150,19 +150,22 @@ class GeminiPlugin(object):
             self.nvim.request('nvim_buf_set_lines', bufnr,
                               0, -1, False, ['Generating...'])
             prompt_parts = [request + '\n']
-            response = self.model.generate_content(prompt_parts, stream=True)
-            current = ''
-            for chunk in response:
-                current += self._extra_chunk(chunk)
-
-                try:
-                    self.nvim.request('nvim_buf_set_lines',
-                                      bufnr, 0, -1, False, current.split('\n'))
-                    current_win = self.nvim.request('nvim_get_current_win')
-                    if current_win.handle == win_id:
-                        self.nvim.request('nvim_feedkeys', 'G$', 'n', False)
-                except Exception:
-                    pass
+            response = self.model.generate_content(prompt_parts)
+            self.nvim.request('nvim_buf_set_lines',                     
+                      bufnr, 0, -1, False, response.text.split('\n')) 
+            # response = self.model.generate_content(prompt_parts, stream=True)
+            # current = ''
+            # for chunk in response:
+            #     current += self._extra_chunk(chunk)
+            #
+            #     try:
+            #         self.nvim.request('nvim_buf_set_lines',
+            #                           bufnr, 0, -1, False, current.split('\n'))
+            #         current_win = self.nvim.request('nvim_get_current_win')
+            #         if current_win.handle == win_id:
+            #             self.nvim.request('nvim_feedkeys', 'G$', 'n', False)
+            #     except Exception:
+            #         pass
 
             self.nvim.request('nvim_echo', [['gemini done.']], True, {})
             insert_chat(request, current)
@@ -277,18 +280,22 @@ class GeminiPlugin(object):
                           0, -1, False, ['Generating...'])
 
         conversation = self.model.start_chat(history=self.chat_history)
-        conversation.send_message(request + '\n', stream=True)
-
+        conversation.send_message(request + '\n')
         last_response = conversation.last
-        current = ''
-        for chunk in last_response:
-            current += self._extra_chunk(chunk)
-
-            self.nvim.request('nvim_buf_set_lines', bufnr,
-                              0, -1, False, current.split('\n'))
-            current_win = self.nvim.request('nvim_get_current_win')
-            if current_win.handle == win_id:
-                self.nvim.request('nvim_feedkeys', 'G$', 'n', False)
+        self.nvim.request('nvim_buf_set_lines', bufnr,
+           0, -1, False, last_response.text.split('\n')) 
+        # conversation.send_message(request + '\n', stream=True)
+        #
+        # last_response = conversation.last
+        # current = ''
+        # for chunk in last_response:
+        #     current += self._extra_chunk(chunk)
+        #
+        #     self.nvim.request('nvim_buf_set_lines', bufnr,
+        #                       0, -1, False, current.split('\n'))
+        #     current_win = self.nvim.request('nvim_get_current_win')
+        #     if current_win.handle == win_id:
+        #         self.nvim.request('nvim_feedkeys', 'G$', 'n', False)
 
         self.chat_history.append({
             'role': 'user',
